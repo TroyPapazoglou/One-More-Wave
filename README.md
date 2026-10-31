@@ -4,6 +4,20 @@
 
 Survive endless waves of enemies, dodge deadly attacks, and push your survival time further with every run.
 
+## Download
+
+Want to give it a try?
+
+Download One More Wave for Windows.
+
+Download the ZIP file from the latest release.
+
+Extract the ZIP to a folder.
+
+Run OneMoreWave.exe to play.
+
+This is an early development build. Bugs and gameplay changes are expected!
+
 ## Gameplay
 
 <p align="center">
@@ -52,28 +66,13 @@ One More Wave is an game project focused on building a simple, survival experien
 
 Current development focuses on enemy behaviours, escalating difficulty, gameplay feedback, and making every run feel worth attempting again.
 
-## Getting Started
+## Source Code
 
-1. Clone or download this repository.
-2. Open the project in Unity Hub.
-3. Select the project using a compatible Unity Editor version.
-4. Open the main game scene and press **Play**.
+One More Wave is developed using Unity 6.6+ and C#.
 
-*Note: The required Unity version is using 6.6 or later.*
+This repository contains the game's source code and Unity project files. It is publicly available for anyone interested in exploring the project's implementation, gameplay systems, enemy behaviours, and overall development.
 
-## Download
-
-Want to give it a try?
-
-Download One More Wave for Windows.
-
-Download the ZIP file from the latest release.
-
-Extract the ZIP to a folder.
-
-Run OneMoreWave.exe to play.
-
-This is an early development build. Bugs and gameplay changes are expected!
+If you're interested in the technical side of the project, feel free to explore the source code!
 
 ## Roadmap
 
