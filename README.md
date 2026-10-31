@@ -83,6 +83,14 @@ This is an early development build. Bugs and gameplay changes are expected!
 - [ ] Add satisfying high-score celebrations
 - [ ] Continue improving the overall survival experience
 
+## Credits & Assets
+
+VFX Assets — Jean Moreno (JMO Assets) for visual effects assets used in the game.
+
+Animation Library — PrimeTween by Kyrylo Kuzyk for its tweening and animation tools.
+
+All third-party assets remain the property of their respective creators and are subject to their applicable licenses.
+
 ---
 
 **One More Wave** — just one more run.
