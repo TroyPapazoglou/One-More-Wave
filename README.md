@@ -28,9 +28,9 @@ Survive endless waves of enemies, dodge deadly attacks, and push your survival t
 
 | Enemy | Appearance | Behaviour | Gameplay |
 |---|---|---|---|
-| Chaser | 🔴 Red circle | Pursues the player relentlessly. | <img width="687" height="687" alt="ChaserDeathGif" src="https://github.com/user-attachments/assets/5ce91ade-3d3a-42f2-9c84-1ea3f246418c" /> |
-| Sprinter | 🟠 Orange triangle | Charges at the player with bursts of speed. | <img width="687" height="687" alt="SprinterDeathGif" src="https://github.com/user-attachments/assets/16ebd79f-c709-4efe-badb-b1e4cd95c07a" /> |
-| Heavy | 🟣 Purple square | Leaps out of the arena and slams down at a targeted position. | <img width="687" height="687" alt="HeavyDeathGif" src="https://github.com/user-attachments/assets/bd3d9308-0296-48c3-a132-86f14f85cf48" />|
+| Chaser | 🔴 Red circle | Pursues the player relentlessly. |<img width="200" height="200" alt="ChaserDeathClip" src="https://github.com/user-attachments/assets/d2a89c79-2f24-46f9-b7e2-8f4cefb195d9" />|
+| Sprinter | 🟠 Orange triangle | Charges at the player with bursts of speed. |<img width="200" height="200" alt="SprinterDeathClip" src="https://github.com/user-attachments/assets/605176dc-0aeb-4029-bf09-8063e0f9b15a" /> |
+| Heavy | 🟣 Purple square | Leaps out of the arena and slams down at a targeted position. |<img width="200" height="200" alt="HeavyDeathClip" src="https://github.com/user-attachments/assets/b2f60500-20e9-4565-ac70-40cf751e23ff" />|
 
 
 ## Controls
