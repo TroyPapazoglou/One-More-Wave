@@ -10,7 +10,7 @@ Survive endless waves of enemies, dodge deadly attacks, and push your survival t
   <img src="gifs/gameplay.gif" alt="One More Wave gameplay" width="80%">
 </p>
 
-<img width="790" height="809" alt="Gameplay" src="https://github.com/user-attachments/assets/ebc4b814-d80b-447f-99ac-0d867450bdb3" />
+<img width="790" height="809" alt="Gameplay" src="https://github.com/user-attachments/assets/e54d6a5f-24ee-4de6-b043-d91889c837c7" />
 
 <p align="center">
   <i>Survive the swarm. Beat your record. Go again.</i>
