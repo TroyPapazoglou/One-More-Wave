@@ -26,7 +26,7 @@ Survive endless waves of enemies, dodge deadly attacks, and push your survival t
 
 ##  Enemies
 
-| Enemy | Appearance | Behaviour | Gameplay |
+| Enemy | Appearance | Behaviour | Execution |
 |---|---|---|---|
 | Chaser | 🔴 Red circle | Pursues the player relentlessly. |<img width="200" height="200" alt="ChaserDeathClip" src="https://github.com/user-attachments/assets/d2a89c79-2f24-46f9-b7e2-8f4cefb195d9" />|
 | Sprinter | 🟠 Orange triangle | Charges at the player with bursts of speed. |<img width="200" height="200" alt="SprinterDeathClip" src="https://github.com/user-attachments/assets/605176dc-0aeb-4029-bf09-8063e0f9b15a" /> |
