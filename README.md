@@ -52,15 +52,6 @@ One More Wave is an game project focused on building a simple, survival experien
 
 Current development focuses on enemy behaviours, escalating difficulty, gameplay feedback, and making every run feel worth attempting again.
 
-<!-- ## More Gameplay -->
-
-<!-- Add more GIFs or screenshots here -->
-
-<p align="center">
-  <img src="gifs/enemies.gif" alt="Enemy behaviours" width="45%">
-  <img src="gifs/high-score.gif" alt="High score animation" width="45%">
-</p>
-
 ## Getting Started
 
 1. Clone or download this repository.
