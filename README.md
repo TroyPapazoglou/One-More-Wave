@@ -54,6 +54,7 @@ This is an early development build. Bugs and gameplay changes are expected!
 | Input | Action |
 |---|---|
 | `WASD` / Arrow Keys |Move |
+| `Esc` / Escape | Exit/Pause |
 
 ## Built With
 
