@@ -59,8 +59,7 @@ public class UIScoreAnimation : MonoBehaviour
     {
         if (timeText == null || string.IsNullOrWhiteSpace(timeText.text))
             return 0;
-
-        // Get the final part after any label, e.g. "HIGH SCORE: 0:00"
+               
         string displayedTime = timeText.text.Trim();
         int lastSpaceIndex = displayedTime.LastIndexOf(' ');
 
@@ -131,7 +130,7 @@ public class UIScoreAnimation : MonoBehaviour
 
     public void Play()
     {
-        highscoreSequence = Sequence.Create(Tween.Alpha(timeSurvivedText, 0, 1)
+        highscoreSequence = Sequence.Create(UIFader.FadeTween(timeSurvivedText, 0, 1)
         .OnComplete(() => { RespawnFadeSequence.Instance.Play(); })
         );
     }

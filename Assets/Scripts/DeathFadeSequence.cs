@@ -7,8 +7,6 @@ public class DeathFadeSequence : MonoBehaviour
 {
     public static DeathFadeSequence Instance { get; private set; }
 
-    [SerializeField] private GameObject[] walls;        
-    [SerializeField] private float wallFadeDuration = 0.5f;
     [SerializeField] private float enemyFadeDuration = 0.25f;
     [SerializeField] private float enemyStagger = 0.1f; 
 
@@ -16,11 +14,7 @@ public class DeathFadeSequence : MonoBehaviour
 
     public IEnumerator Play(Player player, Enemy killer)
     {
-        foreach (GameObject wall in walls)
-        {
-            if (wall != null)
-                FadeAll(wall, wallFadeDuration, 0f);
-        }
+        yield return StartCoroutine(GameManager.Instance.OnPlayerKilled());
 
         Vector2 playerPos = player.transform.position;
 
@@ -35,11 +29,11 @@ public class DeathFadeSequence : MonoBehaviour
                 ))
             .ToList();
 
-        float total = wallFadeDuration;
+        float total = 0;
 
         for (int i = 0; i < ordered.Count; i++)
         {
-            float start = wallFadeDuration + i * enemyStagger;
+            float start = i * enemyStagger;
 
             ordered[i].FadeOutVisuals(enemyFadeDuration, start);
 
@@ -47,11 +41,5 @@ public class DeathFadeSequence : MonoBehaviour
         }
 
         yield return new WaitForSeconds(total);
-    }
-
-    private void FadeAll(GameObject target, float duration, float delay)
-    {
-        foreach (SpriteRenderer sr in target.GetComponentsInChildren<SpriteRenderer>())
-            Tween.Alpha(sr, 0f, duration, startDelay: delay);
-    }
+    } 
 }

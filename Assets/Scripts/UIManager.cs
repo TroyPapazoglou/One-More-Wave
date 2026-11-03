@@ -1,154 +1,100 @@
-using PrimeTween;
-using System;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using Sequence = PrimeTween.Sequence;
 
 public class UIManager : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI OneText;
-    [SerializeField] private TextMeshProUGUI MoreText;
-    [SerializeField] private TextMeshProUGUI WaveText;
-    [SerializeField] private Image playImage;
-    [SerializeField] private Button playButton;
-    [SerializeField] private TextMeshProUGUI playText;
-    [SerializeField] private TextMeshProUGUI highscoreText;
-    [SerializeField] private TextMeshProUGUI timeSurvivedText;
-    [SerializeField] private CanvasGroup menuCanvas;
-    [SerializeField] private CanvasGroup inGameCanvas;
+    [Header("UI Controllers")]
+    [SerializeField] private MainMenuUI mainMenuUI;
+    [SerializeField] private ExitMenuUI exitMenuUI;
+    [SerializeField] private PauseMenuUI pauseMenuUI;
+    [SerializeField] private PersistentMenuButton persistentMenuButton;
 
-    [Header("References")]
-    [SerializeField] private ScoreManager scoreManager;
+    private bool isTransitioning;
 
-
-    [Header("Animation Properties")]
-    [SerializeField] private float OneTextDuration = 3;
-    [SerializeField] private float MoreTextDuration = 3;
-    [SerializeField] private float WaveTextDuration = 4;
-    [SerializeField] private float PlayButtonDuration = 2;
-    [SerializeField] private float highScoreDuration = 4;
-
-    private Sequence introSequence;  
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
+        mainMenuUI.ShowMenu();
+
+        if (GameManager.Instance == null)
+            return;
+
         GameManager.Instance.OnGameStarted += OnGameStarted;
-        scoreManager.scoreChanged += OnScoreChanged;      
-
-        ShowMenuCanvas();
-
+        GameManager.Instance.OnExitPressed += OnExitPressed;
+        GameManager.Instance.OnPausePressed += OnPausePressed;
+        GameManager.Instance.GetPlayer().OnPlayerKilled += OnPlayerKilled;
+        GameManager.Instance.OnQuitRun += OnQuitRun;
     }
 
-    private void OnScoreChanged(string score)
+    private void OnDisable()
     {
-        timeSurvivedText.text = score;
+        if (GameManager.Instance == null)
+            return;
+
+        GameManager.Instance.OnGameStarted -= OnGameStarted;
+        GameManager.Instance.OnExitPressed -= OnExitPressed;
+        GameManager.Instance.OnPausePressed -= OnPausePressed;
+        GameManager.Instance.GetPlayer().OnPlayerKilled -= OnPlayerKilled;
+        GameManager.Instance.OnQuitRun -= OnQuitRun;
     }
-        
+
     private void OnGameStarted()
     {
-        if (introSequence.isAlive)
-            introSequence.Stop();
+        isTransitioning = true;
 
-        FadeAlphaIfNeeded(menuCanvas, 0f, 1f, () =>
-        {
-            OnTransitionEnded();
-
-            FadeAlphaIfNeeded(highscoreText, 0f, 1f);
-            FadeAlphaIfNeeded(timeSurvivedText, 1f, 1f);
-        });
+        persistentMenuButton.SetMainMenuState(false);
+        mainMenuUI.StopIntroAnimation();
+        mainMenuUI.OnGameStarted();
     }
 
-    private void OnTransitionEnded()
-    {
-        GameManager.Instance.MenuTransitionEnded();
+    private void OnExitPressed()
+    {      
+        mainMenuUI.StopIntroAnimation();
+        exitMenuUI.Open();
     }
 
-    public void FadeAlphaIfNeeded(UnityEngine.Object target, float endAlpha, float duration, Action onComplete = null)
+    private void OnPausePressed()
+    {       
+        pauseMenuUI.Toggle();
+    }
+
+    private void OnPlayerKilled()
     {
-        if (target == null)
-        {
-            onComplete?.Invoke();
+        SetTransitioning(true);
+    }
+
+    private void OnQuitRun()
+    {
+        SetTransitioning(true);
+    }
+
+    public void ShowMenu()
+    {
+        SetTransitioning(false);
+        persistentMenuButton.SetMainMenuState(true);
+        mainMenuUI.ShowMenu();
+    }
+
+    public void OnPersistentMenuButtonPressed(bool isMainMenu)
+    {
+        if (isTransitioning)
             return;
-        }
 
-        float currentAlpha;
-
-        switch (target)
+        if (isMainMenu)
         {
-            case CanvasGroup canvasGroup:
-                currentAlpha = canvasGroup.alpha;
-                break;
-
-            case TextMeshProUGUI text:
-                currentAlpha = text.alpha;
-                break;
-
-            case SpriteRenderer sprite:
-                currentAlpha = sprite.color.a;
-                break;
-
-            default:
-                Debug.LogWarning(
-                    $"FadeAlphaIfNeeded does not support {target.GetType().Name}."
-                );
-                onComplete?.Invoke();
-                return;
+            OnExitPressed();
         }
-
-        if (Mathf.Approximately(currentAlpha, endAlpha))
+        else
         {
-            onComplete?.Invoke();
-            return;
-        }
-
-        switch (target)
-        {
-            case CanvasGroup canvasGroup:
-                Tween.Alpha(canvasGroup, endAlpha, duration)
-                    .OnComplete(onComplete);
-                break;
-
-            case TextMeshProUGUI text:
-                Tween.Alpha(text, endAlpha, duration)
-                    .OnComplete(onComplete);
-                break;
-
-            case SpriteRenderer sprite:
-                Tween.Alpha(sprite, endAlpha, duration)
-                    .OnComplete(onComplete);
-                break;
+            OnPausePressed();
         }
     }
 
-
-    public void ShowMenuCanvas()
+    public void EnablePersistentMenuButton()
     {
-        playButton.interactable = true;
-        menuCanvas.alpha = 1;
-
-        Color playImgColour = playImage.color;
-        playImgColour.a = 0;
-
-        OneText.alpha = 0;
-        MoreText.alpha = 0;
-        WaveText.alpha = 0;
-        playImage.color = playImgColour;
-        playText.alpha = 0;
-        highscoreText.alpha = 0;
-
-        introSequence = Sequence.Create();
-
-        introSequence
-            .Chain(Tween.Alpha(OneText, 1, OneTextDuration, startDelay: 1.5f))
-            .Insert(2, Tween.Alpha(MoreText, 1, MoreTextDuration))
-            .Insert(3, Tween.Alpha(WaveText, 1, WaveTextDuration))
-            .Insert(4, Tween.Alpha(playImage, 1, PlayButtonDuration))
-            .Insert(4, Tween.Alpha(playText, 1, PlayButtonDuration))
-            .Insert(6, Tween.Alpha(highscoreText, 1, highScoreDuration));
+        persistentMenuButton.Enable();
     }
 
+    public void SetTransitioning(bool value)
+    {
+        isTransitioning = value;
+    }
 }
-   
-

@@ -24,6 +24,8 @@ public class Enemy : MonoBehaviour
 
     private Sequence visualFadeSequence;
 
+    private Vector3 scale;
+
     public bool IsSpawned { get; private set; } = true;
 
     protected virtual void Awake()
@@ -32,6 +34,8 @@ public class Enemy : MonoBehaviour
             EnemyManager.Instance.AddEnemy(this);
 
         rb = GetComponent<Rigidbody2D>();
+
+        scale = transform.localScale;
     }
 
     private void Start()
@@ -54,7 +58,7 @@ public class Enemy : MonoBehaviour
 
     public virtual void Reset() 
     {
-        transform.localScale = Vector3.one; 
+        transform.localScale = scale;
     }
 
 

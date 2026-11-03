@@ -1,10 +1,16 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
     public static EnemyManager Instance;
+
+    [SerializeField] private float enemyFadeDuration = 0.25f;
+    [SerializeField] private float enemyStagger = 0.1f;
+
     private Player player;
     private readonly List<Enemy> enemyList = new List<Enemy>();
     private bool isRunning = false;
@@ -20,7 +26,16 @@ public class EnemyManager : MonoBehaviour
     private void Start()
     {
         GameManager.Instance.OnMenuTransitionEnded += OnMenuTransitionEnded;
+        GameManager.Instance.OnQuitRun += OnQuitRun;
         player.OnPlayerKilled += OnPlayerKilled;
+     
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.Instance.OnMenuTransitionEnded -= OnMenuTransitionEnded;
+        GameManager.Instance.OnQuitRun -= OnQuitRun;
+        player.OnPlayerKilled -= OnPlayerKilled;
     }
 
     private void OnMenuTransitionEnded()
@@ -77,8 +92,7 @@ public class EnemyManager : MonoBehaviour
     }
     
     public void SetPlayer(Player newPlayer)
-    {
-        Debug.Log("added player");
+    {     
         player = newPlayer;
     }
 
@@ -106,6 +120,21 @@ public class EnemyManager : MonoBehaviour
         }
     }   
 
+    private void OnQuitRun()
+    {
+        StopEnemyMovement();
+        for (int i = enemyList.Count - 1; i >= 0; i--)
+        {
+            Enemy enemy = enemyList[i];
+            if (enemy == null)
+            {
+                //enemyList.RemoveAt(i);
+                continue;
+            }
+            enemy.Disable();
+        }
+    }
+
     public Vector2 GetPlayerPosition()
     {
         if (player == null)
@@ -132,6 +161,36 @@ public class EnemyManager : MonoBehaviour
 
         availableEnemy = null;
         return false;
+    }
+
+    public IEnumerator FadeEnemies(Action onComplete = null)
+    {
+        Vector2 playerPos = player.transform.position;
+
+        var ordered = Enemies
+            .Where(e =>
+                e != null  &&
+                e.IsSpawned)
+            .OrderByDescending(e =>
+                Vector2.SqrMagnitude(
+                    (Vector2)e.transform.position - playerPos
+                ))
+            .ToList();
+
+        float total = 0;
+
+        for (int i = 0; i < ordered.Count; i++)
+        {
+            float start = i * enemyStagger;
+
+            ordered[i].FadeOutVisuals(enemyFadeDuration, start);
+
+            total = start + enemyFadeDuration;
+        }
+
+        yield return new WaitForSeconds(total);
+
+        onComplete?.Invoke();
     }
 
 }

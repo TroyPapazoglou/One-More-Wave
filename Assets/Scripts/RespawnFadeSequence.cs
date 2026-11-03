@@ -31,14 +31,16 @@ public class RespawnFadeSequence : MonoBehaviour
 
             respawnSequence.Group
             (
-                Tween.Alpha(wallRenderer, 1, fadeDuration)
+                UIFader.FadeTween(wallRenderer, 1, fadeDuration)
             );
         }
 
         respawnSequence.OnComplete(() =>
         {
+            GameManager.Instance.GetPlayer().Movement.EnableMainMenuInput();
             GameManager.Instance.GetPlayer().Show();
-            GameManager.Instance.UIManager.ShowMenuCanvas();
+            GameManager.Instance.UIManager.ShowMenu();
+            GameManager.Instance.GetPlayer().FadeIn(2.5f, .5f);
         });
     }
 }

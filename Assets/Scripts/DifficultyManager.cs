@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class DifficultyManager : MonoBehaviour
@@ -22,10 +23,23 @@ public class DifficultyManager : MonoBehaviour
     private void Start()
     {
         GameManager.Instance.GetPlayer().OnPlayerKilled += OnPlayerKilled;
+        GameManager.Instance.OnQuitRun += OnQuitRun;
         StartDifficultyScaling();
     }
 
+    private void OnDestroy()
+    {
+        GameManager.Instance.GetPlayer().OnPlayerKilled -= OnPlayerKilled;
+        GameManager.Instance.OnQuitRun -= OnQuitRun;
+        StopDifficultyScaling();
+    }
+
     private void OnPlayerKilled()
+    {
+        StopDifficultyScaling();
+    }
+
+    private void OnQuitRun()
     {
         StopDifficultyScaling();
     }

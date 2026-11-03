@@ -20,7 +20,15 @@ public class EnemySpawner : MonoBehaviour
     private void Start()
     {
         GameManager.Instance.GetPlayer().OnPlayerKilled += OnPlayerKilled;
+        GameManager.Instance.OnQuitRun += OnQuitRun;
         GameManager.Instance.OnMenuTransitionEnded += OnMenuTransitionEnded; 
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.Instance.GetPlayer().OnPlayerKilled -= OnPlayerKilled;
+        GameManager.Instance.OnQuitRun -= OnQuitRun;
+        GameManager.Instance.OnMenuTransitionEnded -= OnMenuTransitionEnded;
     }
 
     private void OnMenuTransitionEnded()
@@ -29,6 +37,11 @@ public class EnemySpawner : MonoBehaviour
     }
 
     private void OnPlayerKilled()
+    {
+        StopSpawningEnemies();
+    }
+
+    private void OnQuitRun()
     {
         StopSpawningEnemies();
     }

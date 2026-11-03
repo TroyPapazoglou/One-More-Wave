@@ -29,6 +29,7 @@ public class ScoreManager : MonoBehaviour
         GameManager.Instance.OnGameStarted += OnGameStarted;
         GameManager.Instance.OnMenuTransitionEnded += OnMenuTransitionEnded;
         GameManager.Instance.GetPlayer().OnPlayerKilled += OnPlayerKilled;
+        GameManager.Instance.OnQuitRun += OnQuitRun;
         DeathManager.Instance.OnDeathAnimationFinished += OnDeathAnimationFinished;
         uiScoreAnimation.SetHighscoreText(Mathf.FloorToInt(LoadBestTime()));
     }
@@ -44,6 +45,11 @@ public class ScoreManager : MonoBehaviour
     }
 
     private void OnPlayerKilled()
+    {
+        StopStopWatch();
+    }
+
+    private void OnQuitRun()
     {
         StopStopWatch();
     }

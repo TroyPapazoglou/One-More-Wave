@@ -10,6 +10,8 @@ public enum PlayerState
     Dead
 }
 
+
+[RequireComponent(typeof(PlayerMovement))]
 public class Player : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer namePin;
@@ -21,8 +23,12 @@ public class Player : MonoBehaviour
     private PlayerState playerState = PlayerState.Alive;
     public PlayerState PlayerState => playerState;  
     public event Action OnPlayerKilled;
-    
+
+    private PlayerMovement playerMovement;
+    public PlayerMovement Movement => playerMovement;    
+
     private bool isDying = false;
+    private Sequence fadeSequence;
 
 
     protected void Reset()
@@ -39,6 +45,8 @@ public class Player : MonoBehaviour
         if (EnemyManager.Instance != null) 
             EnemyManager.Instance.SetPlayer(this);
 
+        playerMovement = GetComponent<PlayerMovement>();
+
         FadeIn(2.5f, .5f);
     }
 
@@ -51,7 +59,7 @@ public class Player : MonoBehaviour
     {
         if (isDying) return;
 
-        if (collision.gameObject.TryGetComponent<Enemy>(out Enemy enemy))
+        if (collision.gameObject.TryGetComponent(out Enemy enemy))
         {           
             KillPlayer();
             Vector2 contactPoint = collision.GetContact(0).point; 
@@ -60,7 +68,7 @@ public class Player : MonoBehaviour
     }
 
     public void KillPlayer()
-    {
+    {      
         isDying = true;
         OnPlayerKilled?.Invoke();
         playerState = PlayerState.Dead;
@@ -93,11 +101,23 @@ public class Player : MonoBehaviour
         return playerState == PlayerState.Alive;
     }
 
+    
     public void Hide()
     {
-        transform.localScale = Vector3.zero;      
-        GameManager.Instance.UIManager.FadeAlphaIfNeeded(canvasGroup, 0, 1.5f);      
-        GameManager.Instance.UIManager.FadeAlphaIfNeeded(namePin, 0, 1.5f);
+        if (fadeSequence.isAlive)
+            fadeSequence.Stop();
+
+        transform.localScale = Vector3.zero;
+
+        Color spriteColour = spriteRen.color;
+        spriteColour.a = 0;
+
+        spriteRen.color = spriteColour;
+
+        fadeSequence = Sequence.Create(
+            UIFader.FadeTween(canvasGroup, 0f, 1.5f)
+        )
+        .Group(UIFader.FadeTween(namePin, 0f, 1.5f));
     }
 
     private void HideVisual()
@@ -115,8 +135,13 @@ public class Player : MonoBehaviour
 
     public void HidePin()
     {
-        Tween.Alpha(canvasGroup, 0, 1.5f);
-        Tween.Alpha(namePin, 0, 1.5f);
+        if (fadeSequence.isAlive)
+            fadeSequence.Stop();
+
+        fadeSequence = Sequence.Create(
+             UIFader.FadeTween(canvasGroup, 0f, 1.5f)
+         )
+         .Group(UIFader.FadeTween(namePin, 0f, 1.5f));
     }
 
     public void Show()
@@ -124,14 +149,66 @@ public class Player : MonoBehaviour
         Reset();
         transform.localScale = Vector3.one;
         spriteRen.enabled = true;
-        Tween.Alpha(canvasGroup, 1, 1.5f);
-        Tween.Alpha(namePin, 1, 1.5f);
+        //canvasGroup.alpha = 1;
+
+        //Color newPinColor = namePin.color;
+        //newPinColor.a = 1;
+
+        //namePin.color = newPinColor;
     }
 
-    private void FadeIn(float timeToFade = 1, float startDelay = 1.5f)
-    {        
-        Tween.Alpha(spriteRen, 1, timeToFade, startDelay: startDelay);
-        Tween.Alpha(canvasGroup, 1, timeToFade, startDelay: startDelay);
-        Tween.Alpha(namePin, 1, timeToFade, startDelay: startDelay);
+    public void FadeIn(float timeToFade = 1f, float startDelay = 1.5f)
+    {
+        if (fadeSequence.isAlive)
+            fadeSequence.Stop();
+
+        if (transform.localScale == Vector3.zero)
+            transform.localScale = Vector3.one;
+
+        bool spriteNeedsFade = spriteRen.color.a < 0.999f;
+        bool canvasNeedsFade = canvasGroup.alpha < 0.999f;
+        bool namePinNeedsFade = namePin.color.a < 0.999f;
+
+        if (!spriteNeedsFade && !canvasNeedsFade && !namePinNeedsFade)
+            return;
+
+        fadeSequence = Sequence.Create();
+
+        if (spriteNeedsFade)
+        {
+            fadeSequence.Insert(startDelay,
+                UIFader.FadeTween(spriteRen, 1f, timeToFade));
+        }
+
+        if (canvasNeedsFade)
+        {
+            fadeSequence.Insert(startDelay,
+                UIFader.FadeTween(canvasGroup, 1f, timeToFade));
+        }
+
+        if (namePinNeedsFade)
+        {
+            fadeSequence.Insert(startDelay,
+                UIFader.FadeTween(namePin, 1f, timeToFade));
+        }
     }
+
+    public void FadeOut(float timeToFade = 1, float startDelay = 0, float endDelay = 0, Action onComplete = null)
+    {
+        if (fadeSequence.isAlive)
+            fadeSequence.Stop();
+
+        fadeSequence = Sequence.Create(
+            UIFader.FadeTween(spriteRen, 0f, timeToFade, startDelay, endDelay)
+        )
+        .Group(UIFader.FadeTween(canvasGroup, 0f, timeToFade, startDelay, endDelay))
+        .Group(UIFader.FadeTween(namePin, 0f, timeToFade, startDelay, endDelay))
+        .OnComplete(() =>
+        {
+            transform.localScale = Vector3.zero;
+            onComplete?.Invoke();
+        });
+    }
+
+
 }

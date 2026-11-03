@@ -30,6 +30,14 @@ public class CameraManager : MonoBehaviour
         startPos = transform.position;
         GameManager.Instance.OnGameStarted += OnGameStart;
         GameManager.Instance.GetPlayer().OnPlayerKilled += OnPlayerKilled;
+        GameManager.Instance.OnQuitRun += OnQuitRun;
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.Instance.OnGameStarted -= OnGameStart;
+        GameManager.Instance.GetPlayer().OnPlayerKilled -= OnPlayerKilled;
+        GameManager.Instance.OnQuitRun -= OnQuitRun;
     }
 
     private void OnGameStart()
@@ -42,44 +50,35 @@ public class CameraManager : MonoBehaviour
         StopCamera();
     }
 
+    private void OnQuitRun()
+    {
+        StopCamera();
+    }
+
     public void ResetCamera()
     {
         transform.position = startPos;       
     }
-    
+
     public void StartCamera()
     {
-        if (isRunning) return;
-
         isRunning = true;
-
-        cameraCoroutine ??= StartCoroutine(CameraUpdateLoop());
-    }
-
-    private IEnumerator CameraUpdateLoop()
-    {
-        while (isRunning)
-        {          
-            yield return new WaitForEndOfFrame();
-
-            if (camera == null) yield break;
-
-            Vector2 playerPos = EnemyManager.Instance.GetPlayerPosition();
-
-            Vector3 newCamPos = new(playerPos.x, playerPos.y, camTransform.position.z);
-            camTransform.position = Vector3.SmoothDamp(camTransform.position, newCamPos, ref currentVelocity, smoothTime);
-        }
     }
 
     public void StopCamera()
     {
-        if (!isRunning) return;      
-
         isRunning = false;
-        if (cameraCoroutine != null)
-        {
-            StopCoroutine(cameraCoroutine);
-            cameraCoroutine = null;
-        }
+    }
+
+    private void LateUpdate()
+    {
+        if (!isRunning || camera == null) return;
+
+        Vector2 playerPos = EnemyManager.Instance.GetPlayerPosition();
+
+        Vector3 newCamPos = new(playerPos.x, playerPos.y, camTransform.position.z);
+        camTransform.position = Vector3.SmoothDamp(
+            camTransform.position, newCamPos, ref currentVelocity, smoothTime,
+            Mathf.Infinity, Time.deltaTime);
     }
 }
