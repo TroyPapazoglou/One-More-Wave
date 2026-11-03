@@ -8,13 +8,28 @@ Survive endless waves of enemies, dodge deadly attacks, and push your survival t
 
 Want to give it a try?
 
-Download One More Wave for Windows.
+### Windows
 
 Download the ZIP file from the latest release.
 
 Extract the ZIP to a folder.
 
 Run OneMoreWave.exe to play.
+
+
+### Android
+
+Download the Android ZIP file from the latest release onto your phone.
+
+Open your Files app and extract the ZIP.
+
+Open the extracted folder and tap the .apk file to install the game.
+
+If prompted, allow your browser or Files app to install unknown apps, then continue with the installation.
+
+Once installed, open One More Wave and play!
+
+Note: Android may show a security warning because the game isn't installed through the Google Play Store.
 
 This is an early development build. Bugs and gameplay changes are expected!
 
