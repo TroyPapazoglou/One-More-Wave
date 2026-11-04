@@ -303,7 +303,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &74058734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3684,7 +3684,7 @@ MonoBehaviour:
   m_MovementRange: 50
   m_DynamicOriginRange: 100
   m_ControlPath: <Gamepad>/leftStick
-  m_Behaviour: 0
+  m_Behaviour: 1
   m_UseIsolatedInputActions: 0
   m_PointerDownAction:
     m_Name: 
@@ -9057,7 +9057,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2033004149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9208,7 +9208,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2065509840
 Transform:
   m_ObjectHideFlags: 0
