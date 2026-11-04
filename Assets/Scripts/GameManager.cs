@@ -37,6 +37,9 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+
+        if (IsPlatformMobile())
+            Application.targetFrameRate = 120;
     }
 
     private void Start()
