@@ -8,9 +8,11 @@ public class DeathFadeSequence : MonoBehaviour
     public static DeathFadeSequence Instance { get; private set; }
 
     [SerializeField] private float enemyFadeDuration = 0.25f;
-    [SerializeField] private float enemyStagger = 0.1f; 
+    [SerializeField] private float enemyStagger = 0.1f;
+    [SerializeField] private float maxWaitDuration = 2f;
 
     private void Awake() => Instance = this;
+
 
     public IEnumerator Play(Player player, Enemy killer)
     {
@@ -29,17 +31,29 @@ public class DeathFadeSequence : MonoBehaviour
                 ))
             .ToList();
 
-        float total = 0;
+        if (ordered.Count == 0)
+            yield break;
+               
+        float stagger = enemyStagger;
+
+        if (ordered.Count > 1)
+        {
+            float availableStaggerTime = maxWaitDuration - enemyFadeDuration;
+
+            stagger = Mathf.Min(
+                enemyStagger,
+                Mathf.Max(0f, availableStaggerTime / (ordered.Count - 1))
+            );
+        }
 
         for (int i = 0; i < ordered.Count; i++)
         {
-            float start = i * enemyStagger;
+            float start = i * stagger;
 
             ordered[i].FadeOutVisuals(enemyFadeDuration, start);
-
-            total = start + enemyFadeDuration;
         }
 
-        yield return new WaitForSeconds(total);
-    } 
+        yield return new WaitForSeconds(maxWaitDuration);
+    }
+
 }

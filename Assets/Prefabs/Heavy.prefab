@@ -274,7 +274,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Heavy
   moveSpeed: 3
-  visual: {fileID: 7397601960420632522}
+  visualGO: {fileID: 7397601960420632522}
   leapDuration: 0.5
   offscreenPadding: 1
   landingDelay: 0.35
@@ -289,6 +289,9 @@ MonoBehaviour:
   enemyLayers:
     serializedVersion: 2
     m_Bits: 64
+  movingPlayerThreshold: 0.1
+  slamDistanceAhead: 9
+  randomRadius: 1
   crushLeadTime: 0.003
   body: {fileID: 8614247572129249546}
   gameplayColliders:

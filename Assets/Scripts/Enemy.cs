@@ -1,4 +1,5 @@
 using PrimeTween;
+using System.Linq;
 using UnityEngine;
 
 public enum EnemyType
@@ -13,7 +14,8 @@ public enum EnemyType
 public class Enemy : MonoBehaviour
 {
     [SerializeField] protected float moveSpeed = 9f;
-    [SerializeField] protected GameObject visual;
+    [SerializeField] protected GameObject visualGO;
+    protected SpriteRenderer visual;    
     protected Rigidbody2D rb;
     public virtual float SpawnAvailability => 0; // 0 meaning can spawn from start of game
     public virtual float SpawnWeight => 100; // 100 meaning if it were this enemy and one other it would be 50/50 chance to spawn 
@@ -32,6 +34,8 @@ public class Enemy : MonoBehaviour
     {
         if(EnemyManager.Instance != null)
             EnemyManager.Instance.AddEnemy(this);
+
+        visual = visualGO.GetComponent<SpriteRenderer>();
 
         rb = GetComponent<Rigidbody2D>();
 
@@ -90,16 +94,20 @@ public class Enemy : MonoBehaviour
 
     protected virtual SpriteRenderer[] GetVisualRenderers()
     {
-        if (visual == null)
-            return System.Array.Empty<SpriteRenderer>();
+        if (visualGO == null)
+            return visual != null ? new SpriteRenderer[] { visual } : System.Array.Empty<SpriteRenderer>();
 
-        return visual.GetComponentsInChildren<SpriteRenderer>(true);
+        return visualGO.GetComponentsInChildren<SpriteRenderer>(true)
+            .Append(visual)
+            .Where(renderer => renderer != null)
+            .Distinct()
+            .ToArray();
     }
 
     protected virtual void SetVisualRootsActive(bool active)
     {
-        if (visual != null)
-            visual.SetActive(active);
+        if (visualGO != null)
+            visualGO.SetActive(active);
     }
 
     public void ShowVisuals()

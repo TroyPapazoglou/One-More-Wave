@@ -34,6 +34,11 @@ public class Heavy : Enemy
     [SerializeField] private float pushForce = 8f;
     [SerializeField] private LayerMask enemyLayers;
 
+    [Header("Moving Player Slam")]
+    [SerializeField] private float movingPlayerThreshold = 0.1f;
+    [SerializeField] private float slamDistanceAhead = 4f;
+    [SerializeField] private float randomRadius = 2f;
+
     [Header("Finisher")]
     [SerializeField] private float crushLeadTime = 0.15f;
 
@@ -204,7 +209,7 @@ public class Heavy : Enemy
                 descentElapsed / slamDuration
             );
                      
-            progress = progress * progress;
+            progress *= progress;
 
             transform.position = Vector3.Lerp(
                 descentStart,
@@ -249,8 +254,9 @@ public class Heavy : Enemy
         if (landingEffect != null)
         {
             Instantiate(landingEffect, landingPosition, Quaternion.identity);
-        }    
+        }
 
+        rb.constraints |= RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
         rb.position = landingPosition;
         rb.linearVelocity = Vector2.zero;
         rb.simulated = true;
@@ -259,6 +265,7 @@ public class Heavy : Enemy
                 
         yield return new WaitForSeconds(slamRecoveryDuration);
 
+        rb.constraints &= ~(RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY);
         state = HeavyState.Grounded;
     }
 
@@ -266,27 +273,22 @@ public class Heavy : Enemy
     {
         Vector2 target = player.transform.position;
 
-        if (Random.value < predictionChance)
+        if (player.TryGetComponent<Rigidbody2D>(out var playerRb))
         {
-            Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
+            Vector2 velocity = playerRb.linearVelocity;
 
-            if (playerRb != null)
-                target += playerRb.linearVelocity * predictionTime;
+            if (velocity.magnitude > movingPlayerThreshold)
+            {
+                Vector2 direction = velocity.normalized;
+
+                Vector2 targetCentre = target + direction * slamDistanceAhead;
+
+                target = targetCentre + Random.insideUnitCircle * randomRadius;
+            }
         }
 
-        return ClampToCamera(target);
-    }
-
-    private Vector2 ClampToCamera(Vector2 position)
-    {
-        Vector3 viewport =
-            mainCamera.WorldToViewportPoint(position);
-
-        viewport.x = Mathf.Clamp(viewport.x, 0.05f, 0.95f);
-        viewport.y = Mathf.Clamp(viewport.y, 0.05f, 0.95f);
-
-        return mainCamera.ViewportToWorldPoint(viewport);
-    }
+        return LevelBounds.Instance.ClampPosition(target);
+    } 
 
     private void SetGameplayCollision(bool enabled)
     {

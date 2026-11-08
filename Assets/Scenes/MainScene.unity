@@ -3684,7 +3684,7 @@ MonoBehaviour:
   m_MovementRange: 50
   m_DynamicOriginRange: 100
   m_ControlPath: <Gamepad>/leftStick
-  m_Behaviour: 0
+  m_Behaviour: 2
   m_UseIsolatedInputActions: 0
   m_PointerDownAction:
     m_Name: 
@@ -5346,6 +5346,51 @@ Transform:
   - {fileID: 1694416562}
   - {fileID: 1141520263}
   - {fileID: 2011140008}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &939864808
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 939864810}
+  - component: {fileID: 939864809}
+  m_Layer: 0
+  m_Name: LevelBounds
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &939864809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 939864808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e91341cdc03ad7a479f12fb6e1eb0c47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelBounds
+  playableBounds: {fileID: 1606594106}
+--- !u!4 &939864810
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 939864808}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.81103, y: -8.54784, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &951306213
@@ -7460,7 +7505,7 @@ GameObject:
   - component: {fileID: 1606594107}
   - component: {fileID: 1606594106}
   m_Layer: 0
-  m_Name: EnemySpawnField
+  m_Name: PlayableBounds
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7556,12 +7601,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80047a7304d55a949bad262eccdc106c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  enemySpawnField: {fileID: 1606594106}
   enemyList:
   - {fileID: 4116445104758043115, guid: 5232f06728e297340b4e96a5c9b1295b, type: 3}
   - {fileID: 4916498879327512558, guid: 0f465e8d78b344440a163d0a77337f56, type: 3}
   - {fileID: 6596711554440198116, guid: b87bac9e08c60f647b0085da2d1fc87b, type: 3}
-  minimumSpawnDistanceFromPlayer: 5
+  minimumSpawnDistanceFromPlayer: 8
+  forwardSpawnChance: 0.8
+  movingThreshold: 0.1
+  coneAngle: 45
+  minForwardSpawnDistance: 10
+  maxForwardSpawnDistance: 15
+  maxSpawnAttempts: 200
 --- !u!4 &1620281557
 Transform:
   m_ObjectHideFlags: 0
@@ -8070,6 +8120,57 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1860575272}
   m_CullTransparentMesh: 1
+--- !u!1 &1866799042
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1866799044}
+  - component: {fileID: 1866799043}
+  m_Layer: 0
+  m_Name: OffscreenEnemyIndicator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1866799043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1866799042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18a9dce45ffd50429607024eca7e1e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OffscreenEnemyIndicator
+  arrowPrefab: {fileID: 7494089304531884620, guid: c1b533aebe2fcfa4f9c5fb4ae470577e, type: 3}
+  canvasRect: {fileID: 74058737}
+  mainCamera: {fileID: 519420031}
+  detectionConeAngle: 90
+  minimumMovementSpeed: 0.2
+  edgePadding: 35
+  lingerDuration: 0.6
+--- !u!4 &1866799044
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1866799042}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.61595, y: 5.09418, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1880378149
 GameObject:
   m_ObjectHideFlags: 0
@@ -9464,6 +9565,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DeathFadeSequence
   enemyFadeDuration: 0.25
   enemyStagger: 0.05
+  maxWaitDuration: 2
 --- !u!4 &2119348989
 Transform:
   m_ObjectHideFlags: 0
@@ -9952,6 +10054,8 @@ SceneRoots:
   - {fileID: 1776277510}
   - {fileID: 1264124006}
   - {fileID: 2036643087}
+  - {fileID: 939864810}
+  - {fileID: 1866799044}
   - {fileID: 619394802}
   - {fileID: 866417582}
   - {fileID: 1363579379}
