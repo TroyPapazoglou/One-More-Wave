@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class Joystick : MonoBehaviour
 {
     [Header("References")]
+    [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Image backgroundImage;
     [SerializeField] private Image stickImage;
     [SerializeField] private OnScreenStick onScreenStick;
@@ -46,12 +47,16 @@ public class Joystick : MonoBehaviour
     private void OnGameStarted()
     {       
         FadeIn();
+        canvasGroup.blocksRaycasts = true;
+        canvasGroup.interactable = true;
         onScreenStick.enabled = true;       
     }
 
     private void OnGameEnd()
     {
         FadeOut();
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.interactable = false;
         onScreenStick.enabled = false;
     } 
 

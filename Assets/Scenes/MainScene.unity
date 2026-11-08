@@ -3587,6 +3587,7 @@ GameObject:
   m_Component:
   - component: {fileID: 574609635}
   - component: {fileID: 574609636}
+  - component: {fileID: 574609637}
   m_Layer: 5
   m_Name: Joystick
   m_TagString: Untagged
@@ -3626,11 +3627,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 787e048b995243b49a432706e2a5390e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Joystick
+  canvasGroup: {fileID: 574609637}
   backgroundImage: {fileID: 1750942094}
   stickImage: {fileID: 575136126}
   onScreenStick: {fileID: 575136125}
   timeToFade: 0.5
   startDelay: 0
+--- !u!225 &574609637
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 574609634}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 1
 --- !u!1 &575136123
 GameObject:
   m_ObjectHideFlags: 0
