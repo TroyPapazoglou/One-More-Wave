@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Player player;
 
     [Header("Mobile Controls")]
-    [SerializeField] private bool showJoystickInEditor = false;
+    [SerializeField] private bool showMobileUI = false;
 
 
     public event Action OnGameStarted;
@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour
     public bool IsPlatformMobile()   
     {
 #if UNITY_EDITOR       
-        return showJoystickInEditor;
+        return showMobileUI;
 #else           
             return Application.isMobilePlatform;
 #endif
