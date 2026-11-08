@@ -170,5 +170,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 243571c26449eea489de070635cd568a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Chaser
-  moveSpeed: 4
-  visual: {fileID: 8083892681646452498}
+  moveSpeed: 7
+  visualGO: {fileID: 8083892681646452498}

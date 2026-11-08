@@ -8,6 +8,8 @@ public class Sprinter : Enemy
 
     [Header("Charge")]
     [SerializeField] private float chargeTime = 2f;
+    [SerializeField] private SpriteRenderer warningSpriteRenderer;
+    [SerializeField] private float warningPulseSpeed = 5f;
     [SerializeField] private float rotationSpeed = 360f;
     [SerializeField] private float angleOffset = -90f;
 
@@ -27,6 +29,20 @@ public class Sprinter : Enemy
     public override float SpawnAvailability => 20;
     public override float SpawnWeight => 50;
     private Coroutine dashCouroutine = null;
+    private Coroutine warningCoroutine;
+    private Color originalBodyColor;
+    private Vector3 originalWarningScale;
+
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        originalBodyColor = visual.color;
+        originalWarningScale = warningSpriteRenderer.transform.localScale;
+
+        warningSpriteRenderer.enabled = false;
+    }
 
     public override void Reset()
     {
@@ -37,12 +53,14 @@ public class Sprinter : Enemy
     public override void Disable()
     {
         base.Disable();
+        EndChargeVisuals();
         if (dashCouroutine != null) StopCoroutine(dashCouroutine);
         dashCouroutine = null;
         if (originalMass > 0f) rb.mass = originalMass;
         state = State.Moving;
         rb.linearVelocity = Vector2.zero;
         rb.simulated = false;
+        rb.freezeRotation = false;
     }
 
     public override bool Move(Player player)
@@ -75,18 +93,24 @@ public class Sprinter : Enemy
         return true;
     }
 
+    private void LateUpdate()
+    {
+        if (warningSpriteRenderer != null)
+        {
+            warningSpriteRenderer.transform.rotation = Quaternion.identity;
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (state != State.Moving) return;
-
-        if (collision.gameObject.TryGetComponent(out Player player))
-        {          
-            rb.linearVelocity = Vector2.zero;
-            BeginDashing(player);
-        }
-
+        TryBeginDash(collision);
     }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        TryBeginDash(collision);
+    }
+     
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -98,15 +122,125 @@ public class Sprinter : Enemy
         dashBlocked = true;  
     }
 
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (state != State.Dashing) return;
+
+        if (collision.gameObject.TryGetComponent<Player>(out _)) return;
+        if (collision.gameObject.TryGetComponent<Enemy>(out _)) return;
+
+        dashBlocked = true;
+    }
+
+    private void TryBeginDash(Collider2D collision)
+    {
+        if (state != State.Moving) return;
+
+        if (collision.TryGetComponent(out Player player))
+        {
+            rb.linearVelocity = Vector2.zero;
+            BeginDashing(player);
+        }
+    }
+
+
     public void BeginDashing(Player player)
     {
         if (dashCouroutine != null) StopCoroutine(dashCouroutine);
         dashCouroutine = StartCoroutine(DashRoutine(player));
     }
 
+    private void BeginChargeVisuals(float chargeDuration)
+    {
+        EndChargeVisuals();
+
+        warningSpriteRenderer.enabled = true;
+        warningSpriteRenderer.transform.localScale = originalWarningScale * 0.5f;
+
+        warningCoroutine = StartCoroutine(
+            ChargeWarningRoutine(chargeDuration)
+        );
+    }
+
+    private IEnumerator ChargeWarningRoutine(float duration)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+
+            float progress = Mathf.Clamp01(elapsed / duration);
+         
+            float popProgress = Mathf.Clamp01(elapsed / 0.18f);
+            float pop = Mathf.Lerp(
+                0.3f,
+                1.3f,
+                Mathf.Sin(popProgress * Mathf.PI * 0.5f)
+            );
+
+            float pulseSpeed = Mathf.Lerp(2.5f, 7f, progress);
+            float pulseStrength = Mathf.Lerp(0.12f, 0.25f, progress);
+
+            float pulse = 1f + Mathf.Sin(
+                elapsed * pulseSpeed * Mathf.PI * 2f
+            ) * pulseStrength;
+                      
+            float finalPop = 1f;
+
+            if (progress > 0.85f)
+            {
+                float finalProgress = Mathf.InverseLerp(0.85f, 1f, progress);
+                finalPop = Mathf.Lerp(1f, 1.5f, finalProgress);
+            }
+
+            warningSpriteRenderer.transform.localScale = finalPop * pop * pulse * originalWarningScale;
+                                 
+
+            float flashSpeed = Mathf.Lerp(2f, 7f, progress);
+
+            float flashAmount = Mathf.PingPong(elapsed * flashSpeed, 1f);
+            flashAmount = Mathf.SmoothStep(0f, 1f, flashAmount);
+            flashAmount *= Mathf.Lerp(0.4f, 0.8f, progress);
+
+            if (progress > 0.85f)
+            {
+                flashAmount = Mathf.Lerp(
+                    flashAmount,
+                    1f,
+                    Mathf.InverseLerp(0.85f, 1f, progress)
+                );
+            }
+
+            visual.color = Color.Lerp(
+                originalBodyColor,
+                Color.white,
+                flashAmount
+            );
+
+            yield return null;
+        }
+
+        warningCoroutine = null;
+    }
+
+    private void EndChargeVisuals()
+    {
+        if (warningCoroutine != null)
+        {
+            StopCoroutine(warningCoroutine);
+            warningCoroutine = null;
+        }
+
+        warningSpriteRenderer.enabled = false;
+        warningSpriteRenderer.transform.localScale = originalWarningScale;
+        visual.color = originalBodyColor;
+    }
+
     private IEnumerator DashRoutine(Player player)
-    {     
+    {
+        rb.constraints |= RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
         state = State.Charging;
+        BeginChargeVisuals(chargeTime);
         rb.linearVelocity = Vector2.zero;
 
         float elapsed = 0f;
@@ -127,6 +261,9 @@ public class Sprinter : Enemy
         Vector2 dashDir = toTarget.normalized;
         float dashDistance = toTarget.magnitude + overshootDistance;
 
+        rb.constraints &= ~(RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY);
+        EndChargeVisuals();
+        rb.freezeRotation = true;
         state = State.Dashing;
         dashBlocked = false;
 
@@ -144,10 +281,13 @@ public class Sprinter : Enemy
 
         if (dashBlocked)
         {
+            rb.constraints |= RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
             state = State.Stunned;
             yield return new WaitForSeconds(stunTime);           
         }
 
+        rb.constraints &= ~(RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY);
+        rb.freezeRotation = false;
         state = State.Moving;
         dashBlocked = false;
     }

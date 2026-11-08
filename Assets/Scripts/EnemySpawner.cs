@@ -3,22 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
-{
-    [Header("References")]
-    [SerializeField] private BoxCollider2D enemySpawnField;
-
+{ 
     [Header("Enemy Type Prefabs")]
     [SerializeField] private List<Enemy> enemyList;
 
     [Header("Spawn Properties")]
-    [SerializeField] private float minimumSpawnDistanceFromPlayer = 5;   
+    [SerializeField] private float minimumSpawnDistanceFromPlayer = 5;
+
+    [Header("Directional Spawning")]
+    [SerializeField, Range(0f, 1f)] private float forwardSpawnChance = 0.75f;
+    [SerializeField] private float movingThreshold = 0.1f;
+    [SerializeField, Range(0f, 180f)] private float coneAngle = 90f;
+    [SerializeField] private float minForwardSpawnDistance = 5f;
+    [SerializeField] private float maxForwardSpawnDistance = 9f;
+    [SerializeField] private int maxSpawnAttempts = 12;
 
     private bool isRunning = false;
-    private Coroutine spawnCoroutine;  
-   
+    private Coroutine spawnCoroutine;
+    private Player player;
+
 
     private void Start()
     {
+        player = GameManager.Instance.GetPlayer();
         GameManager.Instance.GetPlayer().OnPlayerKilled += OnPlayerKilled;
         GameManager.Instance.OnQuitRun += OnQuitRun;
         GameManager.Instance.OnMenuTransitionEnded += OnMenuTransitionEnded; 
@@ -189,17 +196,7 @@ public class EnemySpawner : MonoBehaviour
             maxWeight,
             startingWeight + growthRate * timeSinceUnlock
         );
-    }
-
-    private Vector2 GetRandomPosition()
-    {
-        Bounds bounds = enemySpawnField.bounds;
-
-        float randomX = Random.Range(bounds.min.x, bounds.max.x);
-        float randomY = Random.Range(bounds.min.y, bounds.max.y);
-
-        return new Vector2(randomX, randomY);
-    }
+    }  
 
     private bool IsValidSpawnPoint(Vector2 spawnPoint)
     {
@@ -214,15 +211,51 @@ public class EnemySpawner : MonoBehaviour
 
     private Vector2 GetSpawnPoint()
     {
-        Vector2 spawnPoint;
+        bool useDirectionalSpawn = false;
 
-        do
+        if (player.TryGetComponent<Rigidbody2D>(out var playerRb))
         {
-            spawnPoint = GetRandomPosition();
+            useDirectionalSpawn = playerRb.linearVelocity.magnitude > movingThreshold && Random.value < forwardSpawnChance;
         }
-        while (!IsValidSpawnPoint(spawnPoint));
-        
 
-        return spawnPoint;
+        if (useDirectionalSpawn)
+        {
+            Vector2 direction = playerRb.linearVelocity.normalized;
+            Vector2 playerPosition = player.transform.position;
+
+            for (int i = 0; i < maxSpawnAttempts; i++)
+            {
+                float angle = Random.Range(-coneAngle / 2f, coneAngle / 2f);
+
+                Vector2 rotatedDirection = Quaternion.Euler(0f, 0f, angle) * direction;
+
+                float maxDistance = LevelBounds.Instance.GetMaxDistanceInDirection(
+                    playerPosition,
+                    rotatedDirection
+                );
+
+                float availableDistance = Mathf.Min(maxForwardSpawnDistance, maxDistance);
+
+                if (availableDistance < minForwardSpawnDistance)
+                    continue;
+
+                float distance = Random.Range(minForwardSpawnDistance, availableDistance);
+
+                Vector2 candidate = playerPosition + rotatedDirection * distance;
+
+                if (IsValidSpawnPoint(candidate))
+                    return candidate;
+            }
+        }       
+              
+        for (int i = 0; i < maxSpawnAttempts; i++)
+        {
+            Vector2 spawnPoint = LevelBounds.Instance.GetRandomPosition();
+
+            if (IsValidSpawnPoint(spawnPoint))
+                return spawnPoint;
+        }
+
+        return LevelBounds.Instance.GetRandomPosition();
     }
 }

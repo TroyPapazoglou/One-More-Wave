@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 15012, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: BuildAutomationSettings
   m_EditorClassIdentifier: UnityEditor.dll::UnityEditor.Build.Profile.BuildAutomationSettings
-  m_OperatingSystemValue: 
-  m_OperatingSystemFamily: 
-  m_XcodeVersion: 
-  m_AndroidSdkVersion: 
-  m_UnityArchitecture: 
-  m_MachineTypeId: 
-  m_CredentialsId: 
+  m_OperatingSystemValue: tahoe
+  m_OperatingSystemFamily: mac
+  m_XcodeVersion: xcode26_3_0
+  m_AndroidSdkVersion: android_sdk_35
+  m_UnityArchitecture: AppleSilicon
+  m_MachineTypeId: orka_standard_v1
+  m_CredentialsId: d491b282-224e-41dc-83de-3d34b0a5fd37
   m_BuildTarget: 9
 --- !u!114 &11400000
 MonoBehaviour:
